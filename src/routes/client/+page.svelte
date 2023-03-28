@@ -1,48 +1,53 @@
-<!-- <section class="flex flex-col w-full h-screen p-6 ml-8 overflow-y-auto bg-gray-200">
-	<div class="bg-white p-2 text-2xl w-full h-full flex flex-col">
-		News Feed
-	</div>
-	<div class=" w-full flex flex-col p-2 bg-gray-200 h-full">
-		<div class="mb-3 p-2 h-auto flex flex-col justify-center">
-			<img class="my-2" src="https://25174313.fs1.hubspotusercontent-eu1.net/hubfs/25174313/assets_moneymax/Blog_Featured_Image_l_How_a_Personal_Loan_is_Calculated.png" alt="promo img">
-			<img class="my-2" src="https://25174313.fs1.hubspotusercontent-eu1.net/hub/25174313/hubfs/assets_moneymax/Best_Personal_Loans.png?width=680&name=Best_Personal_Loans.png" alt="promo 2">
-			<img class="my-2" src="https://25174313.fs1.hubspotusercontent-eu1.net/hub/25174313/hubfs/Low-Interest_Personal_Loans.png?width=680&name=Low-Interest_Personal_Loans.png" alt="promo 2">
-		</div>
-	</div>
-</section>	 -->
+<script>
+  import {userStore} from '$lib/store.js'
+  import { doc, getDoc } from 'firebase/firestore';
+  import {db} from '$lib/firebase/client.js';
 
-<section class="flex flex-col w-full h-screen p-6 ml-8 overflow-y-auto bg-gray-200">
-	<div class=" w-full flex flex-col p-3 bg-gray-200 h-full">
-		<div class="bg-white mb-3 p-2 text-2xl">
-			Payment History
-		</div>
-			<div class="bg-white mb-3 p-2 h-full">
-			<div class="overflow-x-auto">
-				<table class="table table-normal w-full">
-					<thead>
-						<tr class="hover">
-							<th></th> 
-							<th>Loan Status</th> 
-							<th>Amount Paid</th> 
-							<th>Date Paid</th> 								
-						</tr>
-					</thead> 
-					<tbody>
-						<tr class="hover">
-							<th>1</th> 
-							<td>Active</td> 
-							<td>5,000.00 php</td> 
-							<td>12/16/2020</td> 
-						</tr>
-						<tr class="hover">
-							<th>2</th> 
-							<td>Active</td> 
-							<td>10,000.00 php</td> 
-							<td>11/17/2020</td> 
-						</tr>
-					</tbody> 
-				</table>	
-			</div>		
-		</div>
-	</div>
-</section>	
+  let clientData = [];
+
+  async function getClient() {
+    const userId = $userStore.uid;
+    const clientRef = doc(db, "clientinfo", userId);
+    const clientSnapshot = await getDoc(clientRef);
+
+    if (clientSnapshot.exists()) {
+       clientData = clientSnapshot.data();
+      return clientData;
+    } else {
+      alert("No Document Found");
+    }
+  }
+
+  getClient();
+  
+</script>
+
+<svelte:head>
+	<title>JEM | Client Dashboard</title>
+</svelte:head>
+
+
+  
+  <section class="flex flex-col h-screen bg-white rounded-lg" >
+    <!-- <h1 class="p-5 font-bold text-xl">Client Dashboard</h1>
+    <hr/> -->
+    <div class=" flex flex-col w-full p-2 gapx-6">
+      <div class="flex w-full h-14 items-center">
+        {#if $userStore }
+        <h2 class="font-semibold text-xl pl-6 max-sm:text-lg">{$userStore.displayName}</h2>
+        {/if}
+        <span class="font-semibold text-xl pl-2 max-sm:text-lg">({clientData.clientNumber})</span>        
+      </div>
+      <hr/>
+      <div class=" flex flex-col w-full h-32 p-6 mt-3 rounded-md gap-4 max-sm:gap-2 font-semibold justify-center shadow-md">
+          <span>Email: {clientData.email}</span>
+          <span>Address: {clientData.houseNo + ', ' + clientData.barangay + ', ' + clientData.municipality + ', ' + clientData.province}</span>
+          <span>Loan Status: {clientData.status}</span>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-center mt-3">
+      <img src="/finance.gif" alt="">
+
+    </div>
+  </section>

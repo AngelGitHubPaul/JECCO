@@ -1,6 +1,6 @@
 <script>
     import {db} from '$lib/firebase/client.js';
-    import { collection, where, query, getDocs  } from 'firebase/firestore';
+    import { collection, where, query, getDocs, orderBy  } from 'firebase/firestore';
 
     let searchModal = false; 
     let searchInput = "";
@@ -8,10 +8,17 @@
     let searchResultOne = [];
     let searchResultTwo = [];
     let searchResultThree = [];
+    
     export let selected = [];
 
-    export async function getAllClients(){
-        const querySnapshot = await getDocs(collection(db, "clientinfo"));
+    export async function getAllClients(clientWithLoans){
+        let qOne;
+        if (clientWithLoans == true) {
+            qOne = query(collection(db, "clientinfo"), orderBy("status", "desc"),orderBy("clientNumber", "desc"), where("status", "!=", "No Loan") );
+        } else {
+            qOne = query(collection(db, "clientinfo"), orderBy("clientNumber", "desc"));
+        }
+        const querySnapshot = await getDocs(qOne);
         querySnapshot.forEach((doc) => {
             searchResults = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
         });
@@ -48,29 +55,25 @@
         searchInput = "";
     }
 
-
 </script>
 
 <input type="checkbox" bind:checked={searchModal} id="search" class="modal-toggle" />
     <div class="modal">
-        <div class=" modal-box ">
-            
-            <!-- on:submit={updateEmployee} -->
+        <div class="modal-box  w-1/2">
 
-            <form class="relative bg-white rounded-lg shadow dark:bg-gray-700" on:submit={searchClient}>
+            <form class=" bg-white rounded-lg w-full" on:submit={searchClient}>
                 <!-- Modal header -->
-                <div class="flex justify-center items-center p-4 rounded-t border-b dark:border-gray-600 gap-6">
-                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+                <div class="flex justify-center items-center p-4 rounded-t border-b">
+                    <h3 class="text-xl font-semibold text-gray-900">
                         Search  
                     </h3>
                     <input type="search" bind:value={searchInput} class="w-full border-0 border-b-2">
                 </div>
 
                 <!-- table -->
-                <div>
-                    <table class=" table w-full overflow-y-auto">
+                    <table class="table table-compact w-full">
                         <thead>
-                            <th>Client Number</th>
+                            <td>Client Number</td>
                             <th>Full Name</th>
                         </thead>
                         {#each searchResults as searchResult }    
@@ -80,7 +83,6 @@
                         </tr>
                         {/each}
                     </table>   
-                </div>
 
                 <div class="modal-action">    
                     <button type="submit" class="btn border-transparent bg-blue-600">Search</button>
@@ -88,10 +90,5 @@
                     <label for="search" on:click={resetAddUserInput} class="btn border-transparent bg-red-600">Cancel</label>
                 </div>
             </form>
-            <!-- Modal body -->
-            <div class="overflow-y-auto h-full bg-white">
-                <!-- table div -->
-                
-            </div>
         </div>
     </div>

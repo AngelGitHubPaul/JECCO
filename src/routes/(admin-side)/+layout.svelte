@@ -3,6 +3,7 @@
     import {userStore} from '$lib/store.js';
     import {goto} from '$app/navigation';
     import {getDoc,doc} from 'firebase/firestore';
+    import {auth} from '$lib/firebase/client.js'
     import {db} from '$lib/firebase/client.js';
     import {signOut} from 'firebase/auth'
     let show = false;
@@ -32,20 +33,18 @@
     
 </script>
     {#if show}
-    <main class="flex" >
-
-        <section class="w-64 h-screen px-4 py-8 overflow-y-auto pr-20">
+    <main class="md:flex hidden " >    
         <SideNavAdmin/>
-        </section>
-    
-    
-    <section class="flex flex-col w-full h-screen p-6 ml-8 overflow-y-auto bg-gray-200 ">
-
+    <section class="flex flex-col w-full h-screen p-6 overflow-y-auto bg-gray-100 ">
         <slot />           
-
-
     </section>
     </main>
-        
+    
+    <main class=" flex justify-center items-center w-screen h-screen md:hidden " >
+        <div class=" flex flex-col items-center gap-6">
+             <img class=" w-48 " src="/accessdenied.svg" alt="">
+             <p class=" flex text-2xl font-semibold max-sm:text-lg"> Please open on a `Larger Screen` </p>
+        </div>
+    </main>
     {/if}
 
